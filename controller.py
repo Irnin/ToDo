@@ -10,8 +10,15 @@ class Controller:
 		self.view.main()
 
 	def add_task(self, task_description):
-		self.model.add_task(task_description)
-		self.view.add_task_to_table(task_description, False)
+		task = self.model.add_task(task_description)
+		self.view.add_task_to_table(task)
+
+	def swap_task_status(self, task):
+		task.swap_task_status()
+
+	# DEBUG METHODS
+	def print_task_array(self):
+		self.model.print_task_array()
 
 if __name__ == '__main__':
 	application = Controller()

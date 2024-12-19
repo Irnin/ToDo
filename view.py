@@ -13,19 +13,26 @@ class View(tk.Tk):
 		self.tkNewTask = tk.StringVar()
 
 		# creating interface
+		self._create_menu()
 		self._create_list()
 		self._create_form()
 
+	# Creating menus
+	def _create_menu(self):
+		menu_bar = tk.Menu()
+
+		debug_menu = tk.Menu(menu_bar, tearoff=False)
+		debug_menu.add_command(label='Print Array', command=lambda: self.controller.print_task_array())
+
+		menu_bar.add_cascade(label='Debug', menu=debug_menu)
+		self.config(menu=menu_bar)
+
+	# Create frame to put ToDos inside
 	def _create_list(self):
-		frame = tk.Frame(self)
-		self.table = ttk.Treeview(frame, columns=('Done', 'Task'), show='headings')
-		self.table.heading('Done', text='Done')
-		self.table.heading('Task', text='Task')
+		self.task_list = tk.Frame(self)
+		self.task_list.pack(expand=True, fill='both', padx=20, pady=20)
 
-		self.table.pack(fill='both', expand=True)
-
-		frame.pack(expand=True, fill='both')
-
+	# Create Input box with text area and button
 	def _create_form(self):
 		frame = tk.Frame(self, bg='pink')
 
@@ -34,11 +41,14 @@ class View(tk.Tk):
 
 		frame.pack(side='bottom', expand=True, fill='x', padx=20, pady=20)
 
-	def add_task_to_table(self, task, done):
+	# add item to frame created in _create_list()
+	def add_task_to_table(self, task):
+		task_status = tk.BooleanVar(value=task.done)
+		task_description = task.task_description
 
-		done = 'Yep' if done else 'Nope'
-
-		self.table.insert(parent='', index=0, values=(done, task))
+		frame = tk.Frame(self.task_list)
+		tk.Checkbutton(frame, text=task_description, variable=task_status, command=lambda: self.controller.swap_task_status(task)).pack(side='left')
+		frame.pack(expand=True, fill='x')
 
 	def main(self):
 		self.mainloop()
