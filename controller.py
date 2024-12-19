@@ -7,7 +7,11 @@ class Controller:
 		self.view = View(self)
 
 	def main(self):
-		print("Hello World!")
+		self.view.main()
+
+	def add_task(self, task_description):
+		self.model.add_task(task_description)
+		self.view.add_task_to_table(task_description, False)
 
 if __name__ == '__main__':
 	application = Controller()
