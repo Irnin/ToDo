@@ -1,4 +1,5 @@
 import uuid
+import pickle
 
 class Model:
 
@@ -10,6 +11,19 @@ class Model:
 		self.tasks.append(task)
 
 		return task
+
+	def get_list(self):
+		return self.tasks
+
+	def save(self):
+
+		with open('myList.pkl', 'wb') as file:
+			pickle.dump(self, file)
+
+	def load(self):
+		with open('myList.pkl', 'rb') as file:
+			loaded_model = pickle.load(file)
+			self.tasks = loaded_model.tasks
 
 	# DEBUG METHODS
 	def print_task_array(self):
