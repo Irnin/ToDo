@@ -7,6 +7,7 @@ class Controller:
 		self.view = View(self)
 
 	def main(self):
+		self.load()
 		self.view.main()
 
 	def add_task(self, task_description):
@@ -17,6 +18,7 @@ class Controller:
 
 		task = self.model.add_task(task_description)
 		self.view.add_task_to_table(task)
+		self.save()
 
 	def swap_task_status(self, task):
 		task.swap_task_status()

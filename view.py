@@ -38,7 +38,7 @@ class View(tk.Tk):
 	# Create frame to put ToDos inside
 	def _create_list(self):
 		self.task_list = tk.Frame(self)
-		self.task_list.pack(expand=True, fill='both', padx=20, pady=20)
+		self.task_list.pack(expand=False, fill='both', padx=20, pady=20)
 
 	def clear_list(self):
 		for widget in self.task_list.winfo_children():
@@ -54,7 +54,7 @@ class View(tk.Tk):
 		tk.Entry(frame, textvariable=self.tkNewTask).pack(side='left', expand=True, fill='x')
 		tk.Button(frame, text='Add task', command=lambda: self.controller.add_task(self.tkNewTask.get())).pack(side='left')
 
-		frame.pack(side='bottom', expand=True, fill='x', padx=20, pady=20)
+		frame.pack(side='bottom', expand=False, fill='x', padx=20, pady=20)
 
 	def add_tasks(self, tasks):
 		for task in tasks:
@@ -62,9 +62,7 @@ class View(tk.Tk):
 
 	# add item to frame created in _create_list()
 	def add_task_to_table(self, task):
-		# Powiąż task_status z task.done
 		task_status = tk.IntVar(value=1 if task.done else 0)
-
 		task_description = task.task_description
 
 		frame = tk.Frame(self.task_list)
@@ -72,9 +70,12 @@ class View(tk.Tk):
 			frame,
 			text=task_description,
 			variable=task_status,
-			command=lambda t=task, v=task_status: self._update_task_status(t, v)
-		).pack(side='left')
-		frame.pack(expand=True, fill='x')
+			command=lambda t=task, v=task_status: self._update_task_status(t, v),
+			anchor='w'
+		).pack(side='top', anchor='w')
+
+		ttk.Separator(frame, orient='horizontal').pack(fill='x')
+		frame.pack(side='top', expand=True, fill='x')
 
 	def _update_task_status(self, task, task_status):
 		task.done = bool(task_status.get())
