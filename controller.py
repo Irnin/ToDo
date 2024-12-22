@@ -20,6 +20,9 @@ class Controller:
 		self.view.add_task_to_table(task)
 		self.save()
 
+	def get_amount_of_task(self) -> int:
+		return self.model.get_list_size()
+
 	def swap_task_status(self, task):
 		task.swap_task_status()
 		self.save()

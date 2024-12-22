@@ -15,6 +15,10 @@ class Model:
 	def get_list(self):
 		return self.tasks
 
+	def get_list_size(self):
+		self.load()
+		return len(self.tasks)
+
 	def save(self):
 
 		with open('myList.pkl', 'wb') as file:
