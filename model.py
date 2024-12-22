@@ -15,8 +15,10 @@ class Model:
 	def get_list(self):
 		return self.tasks
 
+	def delete_all_tasks(self):
+		self.tasks.clear()
+
 	def get_list_size(self):
-		self.load()
 		return len(self.tasks)
 
 	def save(self):

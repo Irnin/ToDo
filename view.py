@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-from model import Task
-
 class View(tk.Tk):
 
 	def __init__(self, controller):
@@ -10,53 +8,54 @@ class View(tk.Tk):
 		self.controller = controller
 
 		self.title('ToDo')
-		self.minsize(width=300, height=200)
+		self.geometry('300x400')
+		self.minsize(width=300, height=350)
 
 		# Tkinter Variables
 		self.tkNewTask = tk.StringVar()
 
 		# creating interface
 		self._create_menu()
-		self.task_list_widget = TaskListWidget(self) # <---
+		self.task_list_widget = ScrollableFrame(self)
+		self.task_list_widget.pack(fill='both', expand=True, padx=20, pady=20)
 		self._create_form()
 
 		# Bindings
 		self.bind("<Return>", lambda e: self.controller.add_task(self.tkNewTask.get()))
 
-	# Creating menus
 	def _create_menu(self):
+		"""
+		This method is used to create menu of the program
+		"""
 		menu_bar = tk.Menu()
 
+		# File menu
 		file_menu = tk.Menu(menu_bar, tearoff=False)
+		menu_bar.add_cascade(label="File", menu=file_menu)
 		file_menu.add_command(label='Save', command=lambda: self.controller.save())
 		file_menu.add_command(label='Load', command=lambda: self.controller.load())
 
+		# Debug menu
 		debug_menu = tk.Menu(menu_bar, tearoff=False)
-		debug_menu.add_command(label='Print Array', command=lambda: self.controller.print_task_array())
-
-		menu_bar.add_cascade(label="File", menu=file_menu)
 		menu_bar.add_cascade(label='Debug', menu=debug_menu)
+		debug_menu.add_command(label='Print Array', command=lambda: self.controller.print_task_array())
+		debug_menu.add_command(label='Clear tasks', command=lambda: self.controller.remove_all_task())
+
 		self.config(menu=menu_bar)
 
-	# Create Input box with text area and button
 	def _create_form(self):
+		"""
+		Create and locate frame with inputs
+		"""
 		frame = tk.Frame(self)
 
-		inner_frame = tk.Frame(frame)
-
 		tk.Entry(frame, textvariable=self.tkNewTask).pack(side='left', expand=True, fill='x')
-		tk.Button(frame, text='Add task', command=lambda: self.controller.add_task(self.tkNewTask.get())).pack(
-			side='left')
-
-		#inner_frame.pack(fill='x', padx=20, pady=20)
+		tk.Button(frame, text='Add task', command=lambda: self.controller.add_task(self.tkNewTask.get())).pack(side='left')
 
 		frame.pack(side='bottom', expand=False, fill='x', padx=20, pady=20)
-		#frame.place(rely=1, relx=0, relwidth=1, anchor='sw')
 
 	def clear_list(self):
-		pass
-		#for widget in self.task_list_view.winfo_children():
-		#	widget.destroy()
+		self.task_list_widget.clear_frame()
 
 	def clear_input(self):
 		self.tkNewTask.set("")
@@ -65,9 +64,24 @@ class View(tk.Tk):
 		for task in tasks:
 			self.add_task_to_table(task)
 
-	# add item to frame created in _create_list()
 	def add_task_to_table(self, task):
-		self.task_list_widget.add_item(task)
+		"""
+		This method is used to add task to view.
+		"""
+		task_status = tk.IntVar(value=1 if task.done else 0)
+		task_description = task.task_description
+
+		frame = ttk.Frame(self.task_list_widget.scrollable_frame)
+		tk.Checkbutton(
+			frame,
+			text=task_description,
+			variable=task_status,
+			command=lambda t=task, v=task_status: self._update_task_status(t, v),
+			anchor='w'
+		).pack(side='top', anchor='w')
+
+		ttk.Separator(frame, orient='horizontal').pack(fill='x')
+		frame.pack(expand=False, fill='x')
 
 	def _update_task_status(self, task, task_status):
 		task.done = bool(task_status.get())
@@ -76,60 +90,32 @@ class View(tk.Tk):
 	def main(self):
 		self.mainloop()
 
-# This class is responsible for displaying task in main view
-# Needed to separate this code, because tkinker doesn't support this functionality
-class TaskListWidget(ttk.Frame):
-	def __init__(self, parent):
-		super().__init__(parent)
-		self.view = parent
+class ScrollableFrame(ttk.Frame):
+	def __init__(self, container, *args, **kwargs):
 
-		self.pack(expand=True, fill='both', padx=20, pady=20)
-		#self.place(relx=0, rely=0, relwidth=1, relheight=0.9)
-		self.list_height = 0
+		super().__init__(container, *args, **kwargs)
 
-		self.list_height = 25 * self.view.controller.get_amount_of_task()
-		print(self.list_height)
+		self.canvas = tk.Canvas(self)
+		self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+		self.canvas.configure(yscrollcommand=self.scrollbar.set)
+		self.scrollable_frame = ttk.Frame(self.canvas)
+		self.scrollable_window = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+		self.canvas.pack(side="left", fill="both", expand=True)
+		self.scrollbar.pack(side="right", fill="y", padx=10)
 
-		# LAYOUT
-		self.task_view = tk.Canvas(self, scrollregion=(0, 0, self.winfo_width(), self.list_height))
-		self.task_frame = ttk.Frame()
-		self.scroll_bar = ttk.Scrollbar(self, orient='vertical', command=self.task_view.yview)
-		self.task_view.configure(yscrollcommand=self.scroll_bar.set)
+		self.scrollable_frame.bind("<Configure>", self._on_frame_configure)
+		self.canvas.bind("<Configure>", self._on_canvas_configure)
+		self.bind_all("<MouseWheel>", self._on_mouse_wheel)
 
-		self.task_view.pack(side='left', expand=True, fill='both')
-		self.scroll_bar.pack(side='right', expand=False, fill='y', padx=10)
+	def _on_frame_configure(self, event):
+		self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-		#EVENTS
-		self.bind('<Configure>', self._update_size)
+	def _on_canvas_configure(self, event):
+		self.canvas.itemconfig(self.scrollable_window, width=event.width)
 
-	def add_item(self, task: Task):
-		task_status = tk.IntVar(value=1 if task.done else 0)
-		task_description = task.task_description
+	def _on_mouse_wheel(self, event):
+		self.canvas.yview_scroll(-1 * event.delta, "units")
 
-		frame = ttk.Frame(self.task_frame)
-		tk.Checkbutton(
-			frame,
-			text=task_description,
-			variable=task_status,
-			command=lambda t=task, v=task_status: lambda: print("TO DO Update Status"), # <=== TODO update status on clic
-			anchor='w'
-		).pack(side='top', anchor='w')
-
-		ttk.Separator(frame, orient='horizontal').pack(fill='x')
-		frame.pack(expand=False, fill='x')
-
-	def on_mouse_wheel(self, e):
-		if e.state == 1:
-			return
-		else:
-			self.task_view.yview_scroll(-1 * e.delta, 'unit')
-
-	def _update_size(self, event):
-		if self.list_height >= self.winfo_height():
-			height = self.list_height
-			self.bind_all('<MouseWheel>', lambda e: self.on_mouse_wheel(e))
-		else:
-			height = self.winfo_height()
-			self.unbind_all('<MouseWheel>')
-
-		self.task_view.create_window((0,0), window = self.task_frame, anchor='nw', width=self.task_view.winfo_width(), height=height)
+	def clear_frame(self):
+		for widget in self.scrollable_frame.winfo_children():
+			widget.destroy()

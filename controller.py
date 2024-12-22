@@ -41,6 +41,11 @@ class Controller:
 	def print_task_array(self):
 		self.model.print_task_array()
 
+	def remove_all_task(self):
+		self.model.delete_all_tasks()
+		self.view.clear_list()
+		self.save()
+
 if __name__ == '__main__':
 	application = Controller()
 	application.main()
