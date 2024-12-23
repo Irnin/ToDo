@@ -27,6 +27,13 @@ class Controller:
 		task.swap_task_status()
 		self.save()
 
+	def display_tasks(self, kind: str):
+		"""
+		Method is used to display tasks in view
+		"""
+		tasks = self.model.get_list(kind)
+		self.view.add_tasks(tasks)
+
 	def save(self):
 		self.model.save()
 

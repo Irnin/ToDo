@@ -12,7 +12,15 @@ class Model:
 
 		return task
 
-	def get_list(self):
+	def get_list(self, kind: str='All'):
+		match kind:
+			case 'All':
+				return self.tasks
+			case 'Unfinished':
+				return [task for task in self.tasks if not task.done]
+			case 'Finished':
+				return [task for task in self.tasks if task.done]
+
 		return self.tasks
 
 	def delete_all_tasks(self):

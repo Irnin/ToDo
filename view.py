@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from model import Task
 
 class View(tk.Tk):
 
@@ -9,10 +10,11 @@ class View(tk.Tk):
 
 		self.title('ToDo')
 		self.geometry('300x400')
-		self.minsize(width=300, height=350)
+		self.minsize(width=400, height=350)
 
 		# Tkinter Variables
 		self.tkNewTask = tk.StringVar()
+		self.tkDisplayedTask = tk.StringVar(value='All')
 
 		# creating interface
 		self._create_menu()
@@ -35,6 +37,13 @@ class View(tk.Tk):
 		file_menu.add_command(label='Save', command=lambda: self.controller.save())
 		file_menu.add_command(label='Load', command=lambda: self.controller.load())
 
+		# View menu
+		view_menu = tk.Menu(menu_bar, tearoff=False)
+		menu_bar.add_cascade(label='View', menu=view_menu)
+		view_menu.add_radiobutton(label='All', variable=self.tkDisplayedTask, command=lambda: self.controller.display_tasks(self.tkDisplayedTask.get()))
+		view_menu.add_radiobutton(label='Unfinished tasks', variable=self.tkDisplayedTask, value='Unfinished', command=lambda: self.controller.display_tasks(self.tkDisplayedTask.get()))
+		view_menu.add_radiobutton(label='Finished tasks', variable=self.tkDisplayedTask, value='Finished', command=lambda: self.controller.display_tasks(self.tkDisplayedTask.get()))
+
 		# Debug menu
 		debug_menu = tk.Menu(menu_bar, tearoff=False)
 		menu_bar.add_cascade(label='Debug', menu=debug_menu)
@@ -55,16 +64,27 @@ class View(tk.Tk):
 		frame.pack(side='bottom', expand=False, fill='x', padx=20, pady=20)
 
 	def clear_list(self):
+		"""
+		Method clears all elements in task list view. It does nothing with model data
+		"""
 		self.task_list_widget.clear_frame()
 
 	def clear_input(self):
+		"""
+		Clear input after user insert element
+		"""
 		self.tkNewTask.set("")
 
-	def add_tasks(self, tasks):
+	def add_tasks(self, tasks: [Task]):
+		"""
+		Add tasks from list to task list
+		"""
+		self.clear_list()
+
 		for task in tasks:
 			self.add_task_to_table(task)
 
-	def add_task_to_table(self, task):
+	def add_task_to_table(self, task: Task):
 		"""
 		This method is used to add task to view.
 		"""
@@ -83,7 +103,7 @@ class View(tk.Tk):
 		ttk.Separator(frame, orient='horizontal').pack(fill='x')
 		frame.pack(expand=False, fill='x')
 
-	def _update_task_status(self, task, task_status):
+	def _update_task_status(self, task: Task, task_status):
 		task.done = bool(task_status.get())
 		self.controller.save()
 
