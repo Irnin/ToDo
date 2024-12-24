@@ -27,6 +27,14 @@ class Controller:
 		self.view.add_task_to_table(task)
 		self.save()
 
+	def delete_task(self, task: Task):
+		Controller.print_debug("Deleting task")
+		self.model.delete_task(task)
+
+		tasks = self.model.get_list()
+		self.view.clear_list()
+		self.view.add_tasks(tasks)
+
 	def get_amount_of_task(self) -> int:
 		return self.model.get_list_size()
 
@@ -65,11 +73,11 @@ class Controller:
 	# DEBUG METHODS
 	@staticmethod
 	def print_debug(text):
-		print(Fore.YELLOW + 'DEBUG:' + Fore.RESET + text)
+		print(Fore.YELLOW + 'DEBUG: ' + Fore.RESET + text)
 
 	@staticmethod
 	def print_error(text):
-		print(Fore.RED + 'ERROR:' + Fore.RESET + text)
+		print(Fore.RED + 'ERROR: ' + Fore.RESET + text)
 
 	def print_task_array(self):
 		Controller.print_debug("Tasks array:")
