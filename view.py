@@ -75,6 +75,17 @@ class View(tk.Tk):
 		"""
 		self.tkNewTask.set("")
 
+	def display_task_details(self, task: Task):
+		"""
+		Opens new window to display details about selected task
+		"""
+		top_window = tk.Toplevel(self)
+		top_window.title(task.heading)
+		top_window.minsize(width=400, height=300)
+
+		frame = DetailsFrame(top_window, self.controller, task)
+		frame.pack(padx=20, pady=20)
+
 	def add_tasks(self, tasks: [Task]):
 		"""
 		Add tasks from list to task list
@@ -88,27 +99,58 @@ class View(tk.Tk):
 		"""
 		This method is used to add task to view.
 		"""
-		task_status = tk.IntVar(value=1 if task.done else 0)
-		task_description = task.task_description
+		# TODO make separate class for this task
 
-		frame = ttk.Frame(self.task_list_widget.scrollable_frame)
+		task_status = tk.IntVar(value=1 if task.finished else 0)
+		task_heading = task.heading
+
+		# I don't know why i need to pass task_status in command to properly load view from file
+		# it just work so future me, don't remove it
+
+		task_frame = ttk.Frame(self.task_list_widget.scrollable_frame)
+		action_frame = ttk.Frame(task_frame)
 		tk.Checkbutton(
-			frame,
-			text=task_description,
+			action_frame,
+			text=task_heading,
 			variable=task_status,
+			onvalue=1,
+			offvalue=0,
 			command=lambda t=task, v=task_status: self._update_task_status(t, v),
 			anchor='w'
-		).pack(side='top', anchor='w')
+		).pack(side='left', anchor='w')
 
-		ttk.Separator(frame, orient='horizontal').pack(fill='x')
-		frame.pack(expand=False, fill='x')
+		tk.Button(action_frame, text='Details', command=lambda t=task: self.display_task_details(t)).pack(side='right')
+		action_frame.pack(fill='x')
 
-	def _update_task_status(self, task: Task, task_status):
-		task.done = bool(task_status.get())
-		self.controller.save()
+		ttk.Separator(task_frame, orient='horizontal').pack(fill='x')
+		task_frame.pack(side='bottom', expand=False, fill='x')
+
+	def _update_task_status(self, task: Task, task_status: int):
+		# I don't know why i need to pass task_status in command to properly load view from file
+		# it just work so future me, don't remove it
+
+		self.controller.swap_task_status(task)
 
 	def main(self):
 		self.mainloop()
+
+class DetailsFrame(ttk.Frame):
+	def __init__(self, parent, controller, task: Task):
+		super().__init__(parent)
+		self.task = task
+		self.controller = controller
+
+		ttk.Label(self, text='Description:').pack(fill='x')
+		self.text = tk.Text(self, height=10)
+		self.text.insert(tk.END, task.descriptaion)
+		self.text.pack()
+
+		update_description_button = ttk.Button(self, text='Update description', command=self._update_description)
+		update_description_button.pack()
+
+	def _update_description(self):
+		description = self.text.get('1.0', tk.END)
+		self.controller.update_task_description(self.task, description)
 
 class ScrollableFrame(ttk.Frame):
 	def __init__(self, container, *args, **kwargs):

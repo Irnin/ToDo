@@ -1,5 +1,7 @@
-import uuid
 import pickle
+import time
+
+from colorama import Fore
 
 class Model:
 
@@ -7,19 +9,19 @@ class Model:
 		self.tasks = []
 
 	def add_task(self, task_description, done = False):
-		task = Task(task_description, done)
-		self.tasks.append(task)
+		heading = Task(task_description, done)
+		self.tasks.append(heading)
 
-		return task
+		return heading
 
 	def get_list(self, kind: str='All'):
 		match kind:
 			case 'All':
 				return self.tasks
 			case 'Unfinished':
-				return [task for task in self.tasks if not task.done]
+				return [task for task in self.tasks if not task.finished]
 			case 'Finished':
-				return [task for task in self.tasks if task.done]
+				return [task for task in self.tasks if task.finished]
 
 		return self.tasks
 
@@ -41,19 +43,24 @@ class Model:
 
 	# DEBUG METHODS
 	def print_task_array(self):
-		print("Task array:")
 		for task in self.tasks:
 			print(task)
 
 class Task:
-	def __init__(self, task_description, done = False):
-		self.id = uuid.uuid4()
-		self.task_description = task_description
-		self.done = done
+	def __init__(self, heading, done = False):
+		self.finished: bool = done
+		self.heading: str = heading
+		self.descriptaion: str = ""
+		self.created_at: int = int(time.time())
+		self.updated_at: int = -1 # -1 means that task was not updated
 
 	def __str__(self):
-		return f'Done: {self.done}\t\tTask: {self.task_description}'
+		formated_updated_at = "None" if self.updated_at is None else f'{self.updated_at}'
+		return f'{Fore.RESET}Done: {self.finished}\t\tTask: {self.heading}\t\tDescription: {self.descriptaion}\t\tCreated: {self.created_at}\t\tUpdated: {formated_updated_at}'
 
-	def swap_task_status(self):
-		self.done = not self.done
+	def swap_status(self):
+		self.updated_at = int(time.time())
+		self.finished = not self.finished
 
+	def update_description(self, description):
+		self.descriptaion = description
