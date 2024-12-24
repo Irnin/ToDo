@@ -99,7 +99,6 @@ class View(tk.Tk):
 		"""
 		This method is used to add task to view.
 		"""
-		# TODO make separate class for this task
 
 		task_status = tk.IntVar(value=1 if task.finished else 0)
 		task_heading = task.heading
@@ -146,7 +145,12 @@ class DetailsFrame(ttk.Frame):
 		self.text.pack()
 
 		update_description_button = ttk.Button(self, text='Update description', command=self._update_description)
-		update_description_button.pack()
+		update_description_button.pack(fill='x')
+
+		ttk.Separator(self, orient='horizontal').pack(fill='x', pady=20)
+
+		delete_task_button = ttk.Button(self, text='Delete this task', command=self.controller.delete_task(task))
+		delete_task_button.pack(fill='x')
 
 	def _update_description(self):
 		description = self.text.get('1.0', tk.END)

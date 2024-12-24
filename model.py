@@ -1,5 +1,6 @@
 import pickle
 import time
+import uuid
 
 from colorama import Fore
 
@@ -28,6 +29,9 @@ class Model:
 	def delete_all_tasks(self):
 		self.tasks.clear()
 
+	def delete_task(self, task):
+		self.tasks.remove(task)
+
 	def get_list_size(self):
 		return len(self.tasks)
 
@@ -48,6 +52,7 @@ class Model:
 
 class Task:
 	def __init__(self, heading, done = False):
+		self.uuid = uuid.uuid4()
 		self.finished: bool = done
 		self.heading: str = heading
 		self.descriptaion: str = ""
@@ -56,7 +61,14 @@ class Task:
 
 	def __str__(self):
 		formated_updated_at = "None" if self.updated_at is None else f'{self.updated_at}'
-		return f'{Fore.RESET}Done: {self.finished}\t\tTask: {self.heading}\t\tDescription: {self.descriptaion}\t\tCreated: {self.created_at}\t\tUpdated: {formated_updated_at}'
+		return f'{Fore.RESET}ID: {self.uuid}\n\tDone: {self.finished}\n\tTask: {self.heading}\n\tDescription: {self.descriptaion}\n\tCreated: {self.created_at}\n\tUpdated: {formated_updated_at}'
+
+	def __eq__(self, other):
+		if not isinstance(other, Task):
+			# don't attempt to compare against unrelated types
+			return NotImplemented
+
+		return self.uuid == other.uuid
 
 	def swap_status(self):
 		self.updated_at = int(time.time())
