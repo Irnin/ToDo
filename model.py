@@ -10,6 +10,10 @@ class Model:
 	def __init__(self):
 		self.tasks = []
 
+		directory = os.path.expanduser("~/myApp/toDo")
+		os.makedirs(directory, exist_ok=True)
+		self.save_file_path = os.path.join(directory, "myList.pkl")
+
 	def add_task(self, task_description, done = False):
 		heading = Task(task_description, done)
 		self.tasks.append(heading)
@@ -37,19 +41,13 @@ class Model:
 		return len(self.tasks)
 
 	def save(self):
-		directory = os.path.expanduser("~/myApp/toDo")
-		os.makedirs(directory, exist_ok=True)
-		file_path = os.path.join(directory, "myList.pkl")
 
-		with open(file_path, 'wb') as file:
+
+		with open(self.save_file_pathh, 'wb') as file:
 			pickle.dump(self, file)
 
 	def load(self):
-		directory = os.path.expanduser("~/myApp/toDo")
-		os.makedirs(directory, exist_ok=True)
-		file_path = os.path.join(directory, "myList.pkl")
-
-		with open(file_path, 'rb') as file:
+		with open(self.save_file_pathh, 'rb') as file:
 			loaded_model = pickle.load(file)
 			self.tasks = loaded_model.tasks
 
