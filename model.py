@@ -61,13 +61,13 @@ class Task:
 		self.uuid = uuid.uuid4()
 		self.finished: bool = done
 		self.heading: str = heading
-		self.descriptaion: str = ""
+		self.description: str = ""
 		self.created_at: int = int(time.time())
 		self.updated_at: int = -1 # -1 means that task was not updated
 
 	def __str__(self):
 		formated_updated_at = "None" if self.updated_at is None else f'{self.updated_at}'
-		return f'{Fore.RESET}ID: {self.uuid}\n\tDone: {self.finished}\n\tTask: {self.heading}\n\tDescription: {self.descriptaion}\n\tCreated: {self.created_at}\n\tUpdated: {formated_updated_at}'
+		return f'{Fore.RESET}ID: {self.uuid}\n\tDone: {self.finished}\n\tTask: {self.heading}\n\tDescription: {self.description}\n\tCreated: {self.created_at}\n\tUpdated: {formated_updated_at}'
 
 	def __eq__(self, other):
 		if not isinstance(other, Task):
@@ -81,4 +81,4 @@ class Task:
 		self.finished = not self.finished
 
 	def update_description(self, description):
-		self.descriptaion = description
+		self.description = description

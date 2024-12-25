@@ -141,7 +141,7 @@ class DetailsFrame(ttk.Frame):
 
 		ttk.Label(self, text='Description:').pack(fill='x')
 		self.text = tk.Text(self, height=10)
-		self.text.insert(tk.END, task.descriptaion)
+		self.text.insert(tk.END, task.description)
 		self.text.pack()
 
 		update_description_button = ttk.Button(self, text='Update description', command=self._update_description)
@@ -149,7 +149,7 @@ class DetailsFrame(ttk.Frame):
 
 		ttk.Separator(self, orient='horizontal').pack(fill='x', pady=20)
 
-		delete_task_button = ttk.Button(self, text='Delete this task', command=self.controller.delete_task(task))
+		delete_task_button = ttk.Button(self, text='Delete this task', command=lambda: self.controller.delete_task(task))
 		delete_task_button.pack(fill='x')
 
 	def _update_description(self):
