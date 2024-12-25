@@ -1,6 +1,7 @@
 import pickle
 import time
 import uuid
+import os
 
 from colorama import Fore
 
@@ -36,12 +37,19 @@ class Model:
 		return len(self.tasks)
 
 	def save(self):
+		directory = os.path.expanduser("~/myApp/toDo")
+		os.makedirs(directory, exist_ok=True)
+		file_path = os.path.join(directory, "myList.pkl")
 
-		with open('myList.pkl', 'wb') as file:
+		with open(file_path, 'wb') as file:
 			pickle.dump(self, file)
 
 	def load(self):
-		with open('myList.pkl', 'rb') as file:
+		directory = os.path.expanduser("~/myApp/toDo")
+		os.makedirs(directory, exist_ok=True)
+		file_path = os.path.join(directory, "myList.pkl")
+
+		with open(file_path, 'rb') as file:
 			loaded_model = pickle.load(file)
 			self.tasks = loaded_model.tasks
 
