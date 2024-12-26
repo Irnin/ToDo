@@ -69,6 +69,10 @@ class View(tk.Tk):
 		"""
 		self.task_list_widget.clear_frame()
 
+	def displayed_task(self) -> str:
+		kind = self.tkDisplayedTask.get()
+		return kind
+
 	def clear_input(self):
 		"""
 		Clear input after user insert element

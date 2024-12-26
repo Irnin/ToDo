@@ -15,12 +15,22 @@ class Model:
 		self.save_file_path = os.path.join(directory, "myList.pkl")
 
 	def add_task(self, task_description, done = False):
-		heading = Task(task_description, done)
-		self.tasks.append(heading)
+		"""
+		Add task to tasks array
+		"""
+		task = Task(task_description, done)
+		self.tasks.append(task)
 
-		return heading
+		return task
 
 	def get_list(self, kind: str='All'):
+		"""
+		 This method returns array of task depending on kind parameter:
+		 - All - returns all tasks
+		 - Unfinished - returns only tasks with finished property set to False
+		 - Finished - returns only tasks with finished property set to True
+		"""
+
 		match kind:
 			case 'All':
 				return self.tasks
@@ -32,22 +42,35 @@ class Model:
 		return self.tasks
 
 	def delete_all_tasks(self):
+		"""
+		Clear array of tasks
+		"""
 		self.tasks.clear()
 
 	def delete_task(self, task):
+		"""
+		Remove task sent as parameter from array
+		"""
 		self.tasks.remove(task)
 
-	def get_list_size(self):
+	def get_list_size(self) -> int:
+		"""
+		Returns size of list
+		"""
 		return len(self.tasks)
 
 	def save(self):
-
-
-		with open(self.save_file_pathh, 'wb') as file:
+		"""
+		Save data from model to file
+		"""
+		with open(self.save_file_path, 'wb') as file:
 			pickle.dump(self, file)
 
 	def load(self):
-		with open(self.save_file_pathh, 'rb') as file:
+		"""
+		Load model data from file
+		"""
+		with open(self.save_file_path, 'rb') as file:
 			loaded_model = pickle.load(file)
 			self.tasks = loaded_model.tasks
 
@@ -57,9 +80,9 @@ class Model:
 			print(task)
 
 class Task:
-	def __init__(self, heading, done = False):
+	def __init__(self, heading, finished = False):
 		self.uuid = uuid.uuid4()
-		self.finished: bool = done
+		self.finished: bool = finished
 		self.heading: str = heading
 		self.description: str = ""
 		self.created_at: int = int(time.time())
