@@ -24,7 +24,10 @@ class Controller:
 		Controller.print_debug(f'Adding new task to list:\n{task}')
 
 		self.view.clear_input()
-		self.view.add_task_to_table(task)
+
+		if self.view.displayed_task() != 'Finished':
+			self.view.add_task_to_table(task)
+
 		self.save()
 
 	def delete_task(self, task: Task):
